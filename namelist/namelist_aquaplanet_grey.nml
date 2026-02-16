@@ -1,0 +1,110 @@
+! For parameters which are frequently set, in order to keep python scripts tidy and clear, it may be useful to read these from an external namelist file.
+! This example illustrates how to do this for two experiments configured with realistic continents, where the only differences are the choice of surface condition, with one using fixed SSTs and the other Q-fluxes.
+! If you find you have a 'default' set of parameter choices, this method may be useful to ensure these are set consistently for all of your experiments. ! NB Note that this example is for a specific case, and would likely need modifying for your specific set-up.
+
+ &main_nml
+    days   = 30,
+    hours  = 0,
+    minutes = 0,
+    seconds = 0,
+    dt_atmos = 720,
+    current_date = 0001 1 1 0 0 0,
+    calendar = 'thirty_day'/
+
+ &idealized_moist_phys_nml
+    do_damping      = .true.,
+    turb            = .true.,
+    mixed_layer_bc  = .true.,
+    do_virtual      = .false.,
+    do_simple       = .true.,
+    two_stream_gray = .false.,                  !Do use grey radiation
+    convection_scheme = 'FULL_BETTS_MILLER',    !Use the full betts-miller convection scheme
+    roughness_mom   = 2.e-04,                   !Ocean roughness lengths  
+    roughness_heat  = 2.e-04,                   !Ocean roughness lengths  
+    roughness_moist = 2.e-04,                  !Ocean roughness lengths  
+    do_wv_age = .true., /
+   
+
+ &vert_turb_driver_nml
+   do_mellor_yamada       = .false.,  ! default: True
+   do_diffusivity         = .true.,   ! default: False
+   do_simple              = .true.,   ! default: False
+   constant_gust          = 0.0,      ! default: 1.0
+   use_tau                = .false./        
+
+ &diffusivity_nml
+    do_entrain         = .false.,
+    do_simple          = .true./
+
+ &surface_flux_nml
+    use_virtual_temp = .false.,
+    do_simple  = .true.,
+    old_dtaudv = .true.,
+	land_humidity_prefactor = 0.7 /
+
+ &atmosphere_nml
+    idealized_moist_model = .true. /
+
+ &mixed_layer_nml
+    tconst      = 285,
+    prescribe_initial_dist = .true.,
+    evaporation = .true.,
+    depth = 2.5,                        !Mixed layer depth
+    albedo_value = 0.31/                !Ocean albedo value
+
+ &betts_miller_nml
+       rhbm   = .7   , 
+       do_simp = .false., 
+       do_shallower = .true./
+
+ &lscale_cond_nml
+    do_simple=.true.,
+    do_evap = .false./
+
+ &sat_vapor_pres_nml
+    do_simple = .true. /
+
+ &damping_driver_nml
+     do_rayleigh   = .true.,
+     trayfric      = -0.25,
+     sponge_pbottom=  5000.,
+     do_conserve_energy = .true./
+
+ &two_stream_gray_rad_nml
+    rad_scheme = 'frierson',            !Select radiation scheme to use, which in this case is Frierson
+    do_seasonal = .false.,              !do_seasonal=false uses the p2 insolation profile from Frierson 2006. do_seasonal=True uses the GFDL astronomy module to calculate seasonally-varying insolation.
+    atm_abs = 0.2                       ! default: 0.0        
+/
+
+      
+ &diag_manager_nml
+   mix_snapshot_average_fields = .false. /  ! time avg fields are labelled with time in middle of window
+
+ &fms_nml
+   domains_stack_size = 600000 /
+
+ &fms_io_nml
+   threading_write = 'single',
+   fileset_write = 'single' /
+
+ &spectral_dynamics_nml
+    damping_order = 4
+    water_correction_limit = 20000.0
+    robert_coeff = 0.03
+    reference_sea_level_press = 100000.0
+    num_levels = 45
+    valid_range_t = 100.0, 800.0
+    initial_sphum = 2e-06
+    lon_max = 128
+    lat_max = 64
+    num_fourier = 42
+    num_spherical = 43 
+
+    vert_coord_option       = 'hybrid',     !'uneven_sigma',
+    surf_res                = 0.1,
+    scale_heights           = 4.5,
+    p_press                 = 0.05,
+    p_sigma                 = 0.45,
+    exponent                = 1.77 / !Use model's in-built spatial smoothing to smooth topography in order to prevent unwanted aliasing at low horizontal resolution    
+ 
+ 
