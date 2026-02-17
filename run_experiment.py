@@ -7,9 +7,9 @@ run_type = str(sys.argv[1])
 rad_type = str(sys.argv[2])
 n_start_month = int(sys.argv[3])
 n_end_month = int(sys.argv[4])
-
+base_dir = "/home/philbou/projects/def-rfajber/philbou/isca_water_vapour_age_experiment"
 # Read config from JSON file
-config_path = os.path.join("/home/philbou/Isca/exp/test_cases/wv_age/config", f"config_{run_type}_{rad_type}.json")
+config_path = os.path.join(f"{base_dir}/config", f"config_{run_type}_{rad_type}.json")
 with open(config_path, "r") as f:
         config_dict = json.load(f) 
 

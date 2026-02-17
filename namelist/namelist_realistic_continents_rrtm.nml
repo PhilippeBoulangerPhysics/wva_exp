@@ -54,7 +54,7 @@
     prescribe_initial_dist = .true.,
     evaporation = .true.,
     delta_T = 0.,                       !Set latitude contrast in initial temperature profile to zero
-    depth = 5.,                        !Mixed layer depth
+    depth = 20.,                        !Mixed layer depth
     land_option = 'input',              !Tell mixed layer to get land mask from input file
     land_h_capacity_prefactor = 0.1,    !What factor to multiply mixed-layer depth by over land. 
     albedo_value = 0.25,                !Ocean albedo value

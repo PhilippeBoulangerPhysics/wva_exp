@@ -4,11 +4,11 @@
     "run_type": "realistic_continents",
     "vertical_resolution": 45,
     "ncores": 32,
-    "dt_atm": 360,
-    "fixed_sst": false,
+    "dt_atm": 720,
+    "fixed_sst": true,
     "delta_sst": 0,
     "compile": false,
     "rad_type": "rrtm",
     "exp_name_suffix": "_qflux",
-    "comment" : "q-flux \nMixed layer depth is 5."
+    "comment" : "Fixed ssts"
 }

@@ -1,11 +1,67 @@
 import os
-
-import numpy as np
-from field_table_write import write_ft
 import f90nml
-from isca import IscaCodeBase, DiagTable, Experiment, Namelist, GFDL_BASE
+from isca import IscaCodeBase, DiagTable, Experiment, GFDL_BASE
 import datetime
 import sys 
+
+def get_field(n):
+    base = {
+            "atmos_mod": "sphum_age",
+            "longname": "sphum times",
+            "units": "sec (kg/kg)",
+            "numerical_representation": "grid",
+            "hole_filling": "off",
+            "advect_vert": "finite_volume_parabolic",
+            "robert_filter": "on",
+            "profile_type": ["fixed", "surface_value=0.0"]
+        }
+    base["atmos_mod"] += f"_{n+1}"
+    base["longname"] += f" {n+1}-th moment "
+    return base
+
+def write_ft(name,n_moments):
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    # a CodeBase can be a directory on the computer,
+    # useful for iterative development
+    add_dir = "/src/extra/model/isca/"
+    field_table_dir = GFDL_BASE + add_dir
+
+    sphum ={
+            "atmos_mod": "sphum",
+            "longname": "specific humidity",
+            "units": "kg/kg",
+            "numerical_representation": "grid",
+            "hole_filling": "off",
+            "advect_vert": "finite_volume_parabolic",
+            "robert_filter": "on",
+            "profile_type": ["fixed", "surface_value=0.0"]
+            }
+        
+    
+    # Define the file name without an extension
+    output_file = field_table_dir + name
+
+    # Open the file in write mode
+    with open(output_file, 'w') as file:
+        # Write sphum tracer
+        file.write(f'"TRACER",')
+        for key, value in sphum.items():
+            if type(value) == str:
+                file.write(f'"{key}", "{value}"\n')
+            elif type(value) == list:
+                file.write(f'"{key}", "{value[0]}", "{value[1]}"\n')
+        file.write('/ \n')
+
+         
+        for ind in range(n_moments):
+            field = get_field(ind)
+            file.write(f'"TRACER",')
+            for key, value in field.items():
+                if type(value) == str:
+                    file.write(f'"{key}", "{value}"\n')
+                elif type(value) == list:
+                    file.write(f'"{key}", "{value[0]}", "{value[1]}"\n')
+            file.write('/ \n')
 
 class WaterVaporAgeExperiment(Experiment):
     
@@ -23,6 +79,9 @@ class WaterVaporAgeExperiment(Experiment):
         self.base_dir = os.path.dirname(os.path.realpath(__file__))
         self.resolution = self.horizontal_resolution, self.vertical_resolution
         self.exp_name_suffix = config_dict.get('exp_name_suffix', "")
+        self.start_dir = "/home/philbou/projects/def-rfajber/philbou/isca_water_vapour_age_experiment/"
+        self.input_dir = f"{self.start_dir}input/"
+        
         self.cb = IscaCodeBase.from_directory(GFDL_BASE)
         if self.compile:
             self.cb.compile(debug = False)
@@ -62,6 +121,8 @@ class WaterVaporAgeExperiment(Experiment):
         self.set_land()
         
         self.set_fixed_sst()
+        
+        print(self.namelist, file=sys.stdout, flush=True)
 
     def set_land(self):
         land_file = f'era_land_{self.horizontal_resolution.lower()}.nc'
@@ -70,13 +131,13 @@ class WaterVaporAgeExperiment(Experiment):
                 "land_file_name": f"INPUT/{land_file}"
             },
             "spectral_init_cond_nml": {
-                "topog_file_name": land_file
+                "topog_file_name": f"{land_file}"
             }
         }
         if self.run_type == "realistic_continents":
             for nml, files in era_land_files.items():
                 self.update_namelist({nml: files})
-            self.inputfiles.append(os.path.join(self.base_dir,f'input/{land_file}'))
+            self.inputfiles.append(os.path.join(self.input_dir,f'{land_file}'))
     
     def log_description(self):
             print(f"Experiment Name: {self.exp_name}", file=sys.stdout, flush=True)
@@ -103,22 +164,19 @@ class WaterVaporAgeExperiment(Experiment):
         if self.fixed_sst:
             for nml, settings in sst_settings.items():
                 self.update_namelist({nml: settings})
-            sst_file_name = f'input/sst_clim_amip({self.delta_sst}).nc'
-            self.inputfiles.append(os.path.join(self.base_dir,sst_file_name))
+            sst_file_name = f'sst_clim_amip({self.delta_sst}).nc'
+            self.inputfiles.append(os.path.join(self.input_dir,f'{sst_file_name}'))
         
-
     def set_input_files(self):
         """ Get the input files for the experiment based on the run type and resolution. """
         
-        input_files = [os.path.join(GFDL_BASE,'input/rrtm_input_files/ozone_1990.nc'), os.path.join(self.base_dir,'input/siconc_clim_amip.nc')]
+        input_files = [os.path.join(self.input_dir,'rrtm_input_files/ozone_1990.nc'), os.path.join(self.input_dir,'siconc_clim_amip.nc')]
         self.inputfiles = input_files
 
     def set_namelist_from_file(self):
         """ Set the namelist for the experiment based on the run type and resolution. """
-        namelist_path = os.path.join(GFDL_BASE, f'exp/test_cases/wv_age/namelist/namelist_{self.run_type}_{self.rad_type}.nml')
-        
+        namelist_path = os.path.join(self.start_dir, f'namelist/namelist_{self.run_type}_{self.rad_type}.nml')
         self.namelist = f90nml.read(namelist_path)
-        print(self.namelist, file=sys.stdout, flush=True)
         return namelist_path
 
     def get_diag_table(self) -> DiagTable:

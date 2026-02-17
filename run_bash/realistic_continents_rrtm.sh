@@ -20,6 +20,6 @@ export GFDL_DATA=/scratch/philbou/isca_data
 source /home/philbou/.bashrc 
 conda activate isca_env
 
-cd $GFDL_BASE/exp/test_cases/wv_age
+cd /home/philbou/projects/def-rfajber/philbou/isca_water_vapour_age_experiment
 
 python run_experiment.py realistic_continents rrtm $1 $2
