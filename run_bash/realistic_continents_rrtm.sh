@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --nodes=4
 #SBATCH --ntasks-per-node=8 # Make sure ncores in the config file matches this (ncores=32 for 4 nodes * 8 tasks per node)
-#SBATCH --time=1-00:00:00
+#SBATCH --time=5-00:00:00
 #SBATCH --mem-per-cpu=3G
-#SBATCH --job-name=realistic_continents_rrtm
+#SBATCH --job-name=realistic_continents_rrtm_qflux
 #SBATCH --output=/scratch/philbou/outerr/realistic_continents/%x-%j.out
 #SBATCH --error=/scratch/philbou/outerr/realistic_continents/%x-%j.err
 #SBATCH --account=def-rfajber
@@ -20,6 +20,6 @@ export GFDL_DATA=/scratch/philbou/isca_data
 source /home/philbou/.bashrc 
 conda activate isca_env
 
-cd /home/philbou/projects/def-rfajber/philbou/isca_water_vapour_age_experiment
+cd /home/philbou/projects/def-rfajber/philbou/wva_exp
 
 python run_experiment.py realistic_continents rrtm $1 $2

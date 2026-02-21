@@ -79,7 +79,7 @@ class WaterVaporAgeExperiment(Experiment):
         self.base_dir = os.path.dirname(os.path.realpath(__file__))
         self.resolution = self.horizontal_resolution, self.vertical_resolution
         self.exp_name_suffix = config_dict.get('exp_name_suffix', "")
-        self.start_dir = "/home/philbou/projects/def-rfajber/philbou/isca_water_vapour_age_experiment/"
+        self.start_dir = "/home/philbou/projects/def-rfajber/philbou/wva_exp/"
         self.input_dir = f"{self.start_dir}input/"
         
         self.cb = IscaCodeBase.from_directory(GFDL_BASE)

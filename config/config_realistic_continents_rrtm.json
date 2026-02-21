@@ -4,11 +4,12 @@
     "run_type": "realistic_continents",
     "vertical_resolution": 45,
     "ncores": 32,
-    "dt_atm": 720,
-    "fixed_sst": true,
+    "dt_atm": 360,
+    "fixed_sst": false,
     "delta_sst": 0,
     "compile": false,
     "rad_type": "rrtm",
     "exp_name_suffix": "_qflux",
-    "comment" : "Fixed ssts"
+    "other_restart_file": null ,
+    "comment" : "q_flux \nML depth 5."
 }
