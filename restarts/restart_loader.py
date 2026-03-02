@@ -37,13 +37,17 @@ class RestartDataset:
         self.restart_file_path = f"{self.output_dir}/res{self.month:04d}.tar.gz"
         return os.system(f"tar -xzf {self.restart_file_path} -C {self.output_dir_files}")
     
-    def create_tar_gz(self, output_file_name, files_dir, files_to_compress):
+    def create_tar_gz(self, output_file_name, files_dir, files_to_compress, arcname_map=None):
         """Create a tar.gz file from a list of files or directories."""
         output_file = os.path.join(self.output_dir, output_file_name)
         with tarfile.open(output_file, "w:gz") as tar:
             for file_name in files_to_compress:
                 file_path = os.path.join(files_dir, file_name)
-                tar.add(file_path, arcname=os.path.basename(file_path))
+                if arcname_map and file_name in arcname_map:
+                    arcname = arcname_map[file_name]
+                else:
+                    arcname = os.path.basename(file_path)
+                tar.add(file_path, arcname=arcname)
                 
     def open_dataset(self,dataset_name):
         """Open the restart dataset for the given experiment and month."""
@@ -61,7 +65,15 @@ class RestartDataset:
             perturbation_value = self.get_perturbation_value(atmosphere_ds)
             atmosphere_ds["tg"] += perturbation_value
             perturbed_file_path = os.path.join(self.output_dir_perturbed, f"atmosphere_{i}.res.nc")
-            atmosphere_ds.to_netcdf(perturbed_file_path)
+            # Preserve unlimited Time dimension and set _FillValue to None to prevent writing it
+            encoding = {}
+            for var in atmosphere_ds.data_vars:
+                encoding[var] = atmosphere_ds[var].encoding.copy()
+                encoding[var]['_FillValue'] = None
+            for var in atmosphere_ds.coords:
+                encoding[var] = atmosphere_ds[var].encoding.copy()
+                encoding[var]['_FillValue'] = None
+            atmosphere_ds.to_netcdf(perturbed_file_path, unlimited_dims=['Time'], encoding=encoding)
         return perturbed_file_path
     
     def get_random_field(self,shape_like_array):
@@ -83,9 +95,12 @@ class RestartDataset:
             os.system(f"cp {file_path} {self.output_dir_perturbed}")
             
         for i in range(n):
-            OUTPUT_FILENAME_LIST[0] = f"atmosphere_{i}.res.nc"  
+            atmosphere_perturbed_file = f"atmosphere_{i}.res.nc"
+            OUTPUT_FILENAME_LIST[0] = atmosphere_perturbed_file  
             output_file_name = os.path.join(self.output_dir,perturbed_file_path.replace(".tar.gz", f"_{i}.tar.gz"))
-            self.create_tar_gz(output_file_name, self.output_dir_perturbed, OUTPUT_FILENAME_LIST)
+            # Map the perturbed atmosphere file to be stored as atmosphere.res.nc in the tar archive
+            arcname_map = {atmosphere_perturbed_file: "atmosphere.res.nc"}
+            self.create_tar_gz(output_file_name, self.output_dir_perturbed, OUTPUT_FILENAME_LIST, arcname_map=arcname_map)
     
 if __name__ == "__main__":
     experiment_name = str(sys.argv[1])

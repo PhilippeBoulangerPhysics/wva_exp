@@ -107,7 +107,6 @@ class WaterVaporAgeExperiment(Experiment):
         print(f"{datetime.datetime.now()} :field table written for {self.n_moments} moments",file=sys.stdout, flush=True)
     
         self.set_input_files()
-        print(f"{datetime.datetime.now()} :input files set: {self.inputfiles}",file=sys.stdout, flush=True)
         
         self.diag_table = self.get_diag_table()
         print(f"{datetime.datetime.now()} :diag table set",file=sys.stdout, flush=True)
@@ -121,6 +120,7 @@ class WaterVaporAgeExperiment(Experiment):
         self.set_land()
         
         self.set_fixed_sst()
+        print(f"{datetime.datetime.now()} :input files set: {self.inputfiles}",file=sys.stdout, flush=True)
         
         print(self.namelist, file=sys.stdout, flush=True)
 
@@ -271,7 +271,7 @@ class WaterVaporAgeExperiment(Experiment):
         current_n = n_start_month + 1
         while current_n < n_end_month:
             try:
-                for i in range(current_n , n_end_month):
+                for i in range(current_n , n_end_month+1):
                     if current_n ==0: restart = False
                     else: restart = True
                     elapsed_time = self.run(i, num_cores=self.ncores, overwrite_data=True )

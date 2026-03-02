@@ -1,0 +1,15 @@
+{
+    "n_moments": 2,
+    "horizontal_resolution": "T42",
+    "run_type": "realistic_continents",
+    "vertical_resolution": 45,
+    "ncores": 32,
+    "dt_atm": 720,
+    "fixed_sst": true,
+    "delta_sst": 0,
+    "compile": false,
+    "rad_type": "rrtm",
+    "exp_name_suffix": "_RT42_0.1_0",
+    "comment": " | RT42 input | Perturbed restart file: /home/philbou/projects/def-rfajber/philbou/wva_exp/restarts/RT42_sst_0_bucket/0360/res0360_0.1_0.tar.gz",
+    "restart_file": "/home/philbou/projects/def-rfajber/philbou/wva_exp/restarts/RT42_sst_0_bucket/0360/res0360_0.1_0.tar.gz"
+}

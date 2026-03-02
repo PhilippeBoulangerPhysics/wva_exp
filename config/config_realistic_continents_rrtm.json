@@ -10,6 +10,5 @@
     "compile": false,
     "rad_type": "rrtm",
     "exp_name_suffix": "_qflux",
-    "other_restart_file": null ,
-    "comment" : "q_flux \nML depth 5."
+    "comment" : "q_flux \nML depth 20."
 }
