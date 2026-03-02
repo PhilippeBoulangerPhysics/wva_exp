@@ -1,0 +1,15 @@
+{
+    "n_moments": 2,
+    "horizontal_resolution": "T85",
+    "run_type": "realistic_continents",
+    "vertical_resolution": 45,
+    "ncores": 32,
+    "dt_atm": 360,
+    "fixed_sst": false,
+    "delta_sst": 0,
+    "compile": false,
+    "rad_type": "rrtm",
+    "exp_name_suffix": "_qflux_0.1_4",
+    "comment": "q_flux \nML depth 5. | Perturbed restart file: /home/philbou/projects/def-rfajber/philbou/wva_exp/restarts/realistic_continents_T85_2moments_rrtm_qflux/0036/res0036_0.1_4.tar.gz",
+    "restart_file": "/home/philbou/projects/def-rfajber/philbou/wva_exp/restarts/realistic_continents_T85_2moments_rrtm_qflux/0036/res0036_0.1_4.tar.gz"
+}
